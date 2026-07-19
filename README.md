@@ -6,9 +6,9 @@ This folder contains a standalone Streamlit app for free hosting on Streamlit Co
 
 - Upload one Raman spectroscopy `.tsv` sample.
 - Rebuild the feature vector on the saved universal wavenumber axis.
-- Run a 5-model ensemble using KNN, Random Forest, MLP, SVM, and XGBoost.
+- Run one KNN model for prediction.
 - Predict the full formulation and brand name.
-- Show one ensemble confidence score based on model agreement.
+- Show the saved KNN test accuracy as the confidence score.
 
 ## Files
 

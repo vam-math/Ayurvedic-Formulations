@@ -13,20 +13,8 @@ import pandas as pd
 NUM_METADATA_ROWS = 8
 MODELS_DIR = Path(__file__).resolve().parent / "models"
 METADATA_PATH = MODELS_DIR / "preprocessing_metadata.joblib"
-MODEL_FILES = {
-    "knn": "knn_fold_4.joblib",
-    "rf": "rf_fold_1.joblib",
-    "mlp": "mlp_fold_1.joblib",
-    "svm": "svm_fold_2.joblib",
-    "xgb": "xgb_fold_4.joblib",
-}
-MODEL_TEST_ACCURACY = {
-    "knn": 0.994819,
-    "rf": 0.992754,
-    "mlp": 0.991718,
-    "svm": 0.983420,
-    "xgb": 0.983420,
-}
+MODEL_PATH = MODELS_DIR / "knn_fold_4.joblib"
+MODEL_TEST_ACCURACY = 0.994819
 
 
 @dataclass
@@ -42,18 +30,14 @@ class AyurvedaClassifier:
         metadata = joblib.load(metadata_path)
         self.label_to_full_name = dict(metadata["label_to_full_name"])
         self.universal_wavenumbers = np.asarray(metadata["universal_wavenumbers"], dtype=float)
-        self.models = self._load_models(models_dir)
+        self.model = self._load_model(models_dir)
 
     @staticmethod
-    def _load_models(models_dir: Path) -> dict[str, object]:
-        models: dict[str, object] = {}
-        for model_name, filename in MODEL_FILES.items():
-            bundle = joblib.load(models_dir / filename)
-            if isinstance(bundle, dict) and "model" in bundle:
-                models[model_name] = bundle["model"]
-            else:
-                models[model_name] = bundle
-        return models
+    def _load_model(models_dir: Path) -> object:
+        bundle = joblib.load(models_dir / MODEL_PATH.name)
+        if isinstance(bundle, dict) and "model" in bundle:
+            return bundle["model"]
+        return bundle
 
     @staticmethod
     def _read_spectroscopy_file(file_obj: BinaryIO) -> pd.DataFrame:
@@ -101,30 +85,10 @@ class AyurvedaClassifier:
             return formulation, brand
         return full_name, "Unknown"
 
-    def _predict_votes(self, feature_vector: np.ndarray) -> list[tuple[str, str]]:
-        predictions: list[tuple[str, str]] = []
-        for model_name, model in self.models.items():
-            predictions.append((model_name, str(model.predict(feature_vector)[0])))
-        return predictions
-
     def predict(self, file_obj: BinaryIO) -> PredictionResult:
         feature_vector = self.vectorize_upload(file_obj)
-        predictions = self._predict_votes(feature_vector)
-
-        vote_counts: dict[str, int] = {}
-        for _, label in predictions:
-            vote_counts[label] = vote_counts.get(label, 0) + 1
-
-        sorted_votes = sorted(vote_counts.items(), key=lambda item: (-item[1], item[0]))
-        winning_label, _ = sorted_votes[0]
-        supporting_models = [
-            model_name for model_name, label in predictions if label == winning_label
-        ]
-        confidence_percent = (
-            sum(MODEL_TEST_ACCURACY[model_name] for model_name in supporting_models)
-            / len(supporting_models)
-            * 100.0
-        )
+        winning_label = str(self.model.predict(feature_vector)[0])
+        confidence_percent = MODEL_TEST_ACCURACY * 100.0
 
         full_name = self._display_name_from_label(winning_label)
         formulation, brand = self._split_full_name(full_name)
