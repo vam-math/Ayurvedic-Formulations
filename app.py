@@ -9,7 +9,7 @@ from predictor import AyurvedaClassifier
 
 
 st.set_page_config(
-    page_title="Ayurvedic Formulation Classifier",
+    page_title="HerbalMedAI",
     page_icon="🧪",
     layout="centered",
 )
@@ -56,6 +56,14 @@ if cover_image_path.exists():
             color: #ffffff;
             text-align: center;
             letter-spacing: 0.02em;
+            text-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+        }}
+        .hero-subtitle {{
+            margin: 0.65rem 0 0;
+            text-align: center;
+            font-size: 1.05rem;
+            color: #ffffff;
+            letter-spacing: 0.08em;
             text-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
         }}
         label, .stMarkdown, .stMetric label, [data-testid="stFileUploaderDropzoneInstructions"] small {{
@@ -115,7 +123,11 @@ if cover_image_path.exists():
 
 st.markdown('<div class="page-shell">', unsafe_allow_html=True)
 st.markdown(
-    '<h1 class="hero-title">Ayurvedic Formulations Authentication</h1>',
+    '<h1 class="hero-title">HerbalMedAI</h1>',
+    unsafe_allow_html=True,
+)
+st.markdown(
+    '<p class="hero-subtitle">Scan it. Know it. Trust it.</p>',
     unsafe_allow_html=True,
 )
 
