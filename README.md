@@ -1,7 +1,5 @@
 # Ayurvedic Formulation Classifier
 
-This folder contains a standalone Streamlit app for free hosting on Streamlit Community Cloud.
-
 ## What it does
 
 - Upload one Raman spectroscopy `.tsv` sample.
